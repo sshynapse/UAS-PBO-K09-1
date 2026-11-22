@@ -1,17 +1,21 @@
 package model;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import payment.Pembayaran;
 
 /* Transaksi sewa yang dibuat oleh penyewa dan diproses oleh admin */
 public class Transaksi {
 
-    /* Status transaksi yang menunggu persetujuan admin. */
+    /* Denda keterlambatan per hari per barang (rupiah) */
+    public static final double DENDA_PER_HARI = 20000;
+
+    /* Status transaksi yang menunggu persetujuan admin */
     public static final String MENUNGGU = "MENUNGGU";
-    /* Status transaksi yang sudah diterima admin (barang sedang disewa). */
+    /* Status transaksi yang sudah diterima admin (barang sedang disewa) */
     public static final String AKTIF = "AKTIF";
-    /* Status transaksi yang barangnya sudah dikembalikan. */
+    /* Status transaksi yang barangnya sudah dikembalikan */
     public static final String SELESAI = "SELESAI";
 
     private String id;
@@ -134,11 +138,19 @@ public class Transaksi {
 
     /**
      * Menghitung denda keterlambatan pengembalian
+     * Denda = hari telat x Rp20.000 x jumlah barang
      *
-     * @return total denda dalam rupiah, 0 jika tidak terlambat
+     * @return total denda dalam rupiah, 0 jika belum dikembalikan atau tidak terlambat
      */
     public double hitungDenda() {
-        return 0;
+        if (tanggalKembali == null) {
+            return 0;
+        }
+        long hariTelat = ChronoUnit.DAYS.between(tanggalJatuhTempo, tanggalKembali);
+        if (hariTelat <= 0) {
+            return 0;
+        }
+        return hariTelat * DENDA_PER_HARI * barang.size();
     }
 
     /**
