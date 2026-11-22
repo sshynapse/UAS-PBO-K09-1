@@ -4,17 +4,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import payment.Pembayaran;
 
-/**
- * Transaksi sewa yang dibuat oleh penyewa dan diproses oleh admin.
- * (Kerangka: isi method dilengkapi pada commit berikutnya.)
- */
+/* Transaksi sewa yang dibuat oleh penyewa dan diproses oleh admin */
 public class Transaksi {
 
-    /** Status transaksi yang menunggu persetujuan admin. */
+    /* Status transaksi yang menunggu persetujuan admin. */
     public static final String MENUNGGU = "MENUNGGU";
-    /** Status transaksi yang sudah diterima admin (barang sedang disewa). */
+    /* Status transaksi yang sudah diterima admin (barang sedang disewa). */
     public static final String AKTIF = "AKTIF";
-    /** Status transaksi yang barangnya sudah dikembalikan. */
+    /* Status transaksi yang barangnya sudah dikembalikan. */
     public static final String SELESAI = "SELESAI";
 
     private String id;
@@ -28,7 +25,8 @@ public class Transaksi {
     private Pembayaran pembayaran;
 
     /**
-     * Membuat transaksi baru.
+     * Membuat transaksi baru. Tanggal sewa diisi hari ini,
+     * tanggal jatuh tempo dihitung dari lama sewa, dan status awal MENUNGGU
      *
      * @param id         ID transaksi
      * @param penyewa    penyewa yang membuat transaksi
@@ -43,19 +41,99 @@ public class Transaksi {
         this.barang = barang;
         this.lamaSewa = lamaSewa;
         this.pembayaran = pembayaran;
+        this.tanggalSewa = LocalDate.now();
+        this.tanggalJatuhTempo = tanggalSewa.plusDays(lamaSewa);
+        this.status = MENUNGGU;
     }
 
     /**
-     * Menghitung total biaya sewa seluruh barang.
+     * @return ID transaksi
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @return penyewa yang membuat transaksi
+     */
+    public Penyewa getPenyewa() {
+        return penyewa;
+    }
+
+    /**
+     * @return daftar barang yang disewa
+     */
+    public ArrayList<Barang> getBarang() {
+        return barang;
+    }
+
+    /**
+     * @return lama sewa dalam hari
+     */
+    public int getLamaSewa() {
+        return lamaSewa;
+    }
+
+    /**
+     * @return tanggal mulai sewa
+     */
+    public LocalDate getTanggalSewa() {
+        return tanggalSewa;
+    }
+
+    /**
+     * @return tanggal jatuh tempo pengembalian
+     */
+    public LocalDate getTanggalJatuhTempo() {
+        return tanggalJatuhTempo;
+    }
+
+    /**
+     * @return tanggal barang dikembalikan, null jika belum dikembalikan
+     */
+    public LocalDate getTanggalKembali() {
+        return tanggalKembali;
+    }
+
+    /**
+     * Mengisi tanggal barang dikembalikan
+     *
+     * @param tanggalKembali tanggal pengembalian
+     */
+    public void setTanggalKembali(LocalDate tanggalKembali) {
+        this.tanggalKembali = tanggalKembali;
+    }
+
+    /**
+     * @return status transaksi saat ini
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * @return metode pembayaran yang dipilih
+     */
+    public Pembayaran getPembayaran() {
+        return pembayaran;
+    }
+
+    /**
+     * Menghitung total biaya sewa seluruh barang
+     * Tiap barang menghitung biayanya sendiri sesuai kategorinya
      *
      * @return total biaya dalam rupiah
      */
     public double hitungTotal() {
-        return 0;
+        double total = 0;
+        for (Barang b : barang) {
+            total += b.hitungBiaya(lamaSewa);
+        }
+        return total;
     }
 
     /**
-     * Menghitung denda keterlambatan pengembalian.
+     * Menghitung denda keterlambatan pengembalian
      *
      * @return total denda dalam rupiah, 0 jika tidak terlambat
      */
@@ -64,10 +142,11 @@ public class Transaksi {
     }
 
     /**
-     * Mengubah status transaksi.
+     * Mengubah status transaksi
      *
      * @param status MENUNGGU, AKTIF, atau SELESAI
      */
     public void ubahStatus(String status) {
+        this.status = status;
     }
 }
