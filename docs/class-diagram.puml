@@ -1,0 +1,158 @@
+@startuml
+title Class Diagram - Rental Sepeda Listrik & Skuter
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package model {
+  abstract class Akun {
+    - id: String
+    - username: String
+    - password: String
+    + login(username: String, password: String): boolean
+  }
+
+  class Admin {
+    + kelolaBarang(daftar: DaftarBarang, sc: Scanner): void
+    + terimaTransaksi(t: Transaksi): void
+    + konfirmasiKembali(t: Transaksi, tgl: LocalDate): void
+    + tampilMenu(data: DataSistem, sc: Scanner): void
+  }
+
+  class Penyewa {
+    - keranjang: KeranjangSewa
+    - riwayat: ArrayList<Transaksi>
+    + lihatBarang(daftar: DaftarBarang): void
+    + buatTransaksi(lama: int, p: Pembayaran, id: String): Transaksi
+    + lihatRiwayat(): void
+    + tambahRiwayat(t: Transaksi): void
+    + tampilMenu(data: DataSistem, sc: Scanner): void
+  }
+
+  abstract class Barang {
+    - id: String
+    - nama: String
+    - tarifHarian: double
+    - tersedia: boolean
+    + hitungBiaya(hari: int): double
+    + getKategori(): String
+  }
+
+  class SepedaListrik {
+    + hitungBiaya(hari: int): double
+  }
+  class SkuterListrik {
+    + hitungBiaya(hari: int): double
+  }
+  class SkuterPremium {
+    + hitungBiaya(hari: int): double
+  }
+
+  class Transaksi {
+    + {static} MENUNGGU: String
+    + {static} AKTIF: String
+    + {static} SELESAI: String
+    - id: String
+    - penyewa: Penyewa
+    - barang: ArrayList<Barang>
+    - lamaSewa: int
+    - tanggalSewa: LocalDate
+    - tanggalJatuhTempo: LocalDate
+    - tanggalKembali: LocalDate
+    - status: String
+    - pembayaran: Pembayaran
+    + hitungTotal(): double
+    + hitungDenda(): double
+    + ubahStatus(status: String): void
+  }
+
+  class Invoice {
+    - transaksi: Transaksi
+    + cetakInvoice(): void
+  }
+}
+
+package payment {
+  interface Pembayaran {
+    + prosesPembayaran(jumlah: double): void
+    + getNamaMetode(): String
+  }
+  class TransferBank {
+    + prosesPembayaran(jumlah: double): void
+  }
+  class QRIS {
+    + prosesPembayaran(jumlah: double): void
+  }
+  class Tunai {
+    + prosesPembayaran(jumlah: double): void
+  }
+}
+
+package service {
+  class DaftarBarang {
+    - barang: ArrayList<Barang>
+    + tambahBarang(b: Barang): void
+    + editBarang(id: String, nama: String, tarif: double): void
+    + hapusBarang(id: String): void
+    + cariBarang(id: String): Barang
+    + menuKelola(sc: Scanner): void
+  }
+
+  class KeranjangSewa {
+    - barang: ArrayList<Barang>
+    + tambahBarang(b: Barang): void
+    + hapusBarang(id: String): void
+  }
+
+  class DataSistem {
+    - akun: HashMap<String, Akun>
+    - daftarBarang: DaftarBarang
+    - daftarTransaksi: ArrayList<Transaksi>
+    + login(u: String, p: String): Akun
+    + tambahTransaksi(t: Transaksi): void
+  }
+}
+
+package exception {
+  class LoginGagalException <<exception>>
+  class BarangTidakTersediaException <<exception>>
+}
+
+class Main {
+  - akunAktif: Akun
+  + main(args: String[]): void
+  + login(): void
+}
+
+' Inheritance
+Akun <|-- Admin
+Akun <|-- Penyewa
+Barang <|-- SepedaListrik
+Barang <|-- SkuterListrik
+Barang <|-- SkuterPremium
+
+' Interface
+Pembayaran <|.. TransferBank
+Pembayaran <|.. QRIS
+Pembayaran <|.. Tunai
+
+' Relasi
+Penyewa *-- KeranjangSewa
+Penyewa o-- Transaksi
+Transaksi o-- Barang
+Transaksi --> Pembayaran
+Invoice --> Transaksi
+DaftarBarang o-- Barang
+KeranjangSewa o-- Barang
+DataSistem o-- Akun
+DataSistem *-- DaftarBarang
+DataSistem o-- Transaksi
+Admin ..> Invoice
+Admin ..> DaftarBarang
+Main --> DataSistem
+
+' Exception
+DataSistem ..> LoginGagalException : throws
+KeranjangSewa ..> BarangTidakTersediaException : throws
+DaftarBarang ..> BarangTidakTersediaException : throws
+Admin ..> BarangTidakTersediaException : throws
+@enduml

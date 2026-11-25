@@ -5,17 +5,19 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import payment.Pembayaran;
 
-/* Transaksi sewa yang dibuat oleh penyewa dan diproses oleh admin */
+/**
+ * Transaksi sewa yang dibuat oleh penyewa dan diproses oleh admin.
+ */
 public class Transaksi {
 
-    /* Denda keterlambatan per hari per barang (rupiah) */
+    /** Denda keterlambatan per hari per barang (rupiah). */
     public static final double DENDA_PER_HARI = 20000;
 
-    /* Status transaksi yang menunggu persetujuan admin */
+    /** Status transaksi yang menunggu persetujuan admin. */
     public static final String MENUNGGU = "MENUNGGU";
-    /* Status transaksi yang sudah diterima admin (barang sedang disewa) */
+    /** Status transaksi yang sudah diterima admin (barang sedang disewa). */
     public static final String AKTIF = "AKTIF";
-    /* Status transaksi yang barangnya sudah dikembalikan */
+    /** Status transaksi yang barangnya sudah dikembalikan. */
     public static final String SELESAI = "SELESAI";
 
     private String id;
@@ -30,7 +32,7 @@ public class Transaksi {
 
     /**
      * Membuat transaksi baru. Tanggal sewa diisi hari ini,
-     * tanggal jatuh tempo dihitung dari lama sewa, dan status awal MENUNGGU
+     * tanggal jatuh tempo dihitung dari lama sewa, dan status awal MENUNGGU.
      *
      * @param id         ID transaksi
      * @param penyewa    penyewa yang membuat transaksi
@@ -100,7 +102,7 @@ public class Transaksi {
     }
 
     /**
-     * Mengisi tanggal barang dikembalikan
+     * Mengisi tanggal barang dikembalikan.
      *
      * @param tanggalKembali tanggal pengembalian
      */
@@ -123,8 +125,8 @@ public class Transaksi {
     }
 
     /**
-     * Menghitung total biaya sewa seluruh barang
-     * Tiap barang menghitung biayanya sendiri sesuai kategorinya
+     * Menghitung total biaya sewa seluruh barang.
+     * Tiap barang menghitung biayanya sendiri sesuai kategorinya.
      *
      * @return total biaya dalam rupiah
      */
@@ -137,8 +139,8 @@ public class Transaksi {
     }
 
     /**
-     * Menghitung denda keterlambatan pengembalian
-     * Denda = hari telat x Rp20.000 x jumlah barang
+     * Menghitung denda keterlambatan pengembalian.
+     * Denda = hari telat x Rp20.000 x jumlah barang.
      *
      * @return total denda dalam rupiah, 0 jika belum dikembalikan atau tidak terlambat
      */
@@ -154,7 +156,7 @@ public class Transaksi {
     }
 
     /**
-     * Mengubah status transaksi
+     * Mengubah status transaksi.
      *
      * @param status MENUNGGU, AKTIF, atau SELESAI
      */
